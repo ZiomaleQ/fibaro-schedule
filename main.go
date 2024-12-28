@@ -115,7 +115,7 @@ func deviceAction(device Device, action string) error {
 
 	deviceId := strconv.Itoa(device.Id)
 
-	req, err := http.NewRequest("http://hc3l-00071046.local/api/devices/"+deviceId+"/action/"+action, "POST", payload)
+	req, err := http.NewRequest("POST", "http://192.168.1.37/api/devices/"+deviceId+"/action/"+action, payload)
 
 	if err != nil {
 		return err
