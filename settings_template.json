@@ -1,0 +1,26 @@
+{
+  "Device": {
+    "Id": 0,
+    "TurnOn": "turnOn",
+    "TurnOff": "turnOff"
+  },
+  "User": {
+    "Email": " ",
+    "Password": " "
+  },
+  "Schedules": [
+    {
+      "From": "0:00",
+      "To": "0:00",
+      "Every": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ]
+    }
+  ]
+}
