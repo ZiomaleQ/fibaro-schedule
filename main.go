@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,7 +13,6 @@ import (
 )
 
 var client = &http.Client{}
-var auth = "Basic "
 
 func main() {
 	data, err := os.ReadFile("settings.json")
@@ -42,10 +42,10 @@ func main() {
 				for _, day := range schedule.Every {
 					if Weekday[day] == now.Weekday() {
 						if !lastKnownValue {
-							err = turnOn(settings.Device)
+							err = turnOn(settings)
 
 							if err != nil {
-								fmt.Println(err)
+								panic(err)
 							}
 						}
 						lastKnownValue = true
@@ -56,10 +56,10 @@ func main() {
 		}
 
 		if lastKnownValue && !inSchedule {
-			err = turnOff(settings.Device)
+			err = turnOff(settings)
 
 			if err != nil {
-				fmt.Println(err)
+				panic(err)
 			}
 
 			lastKnownValue = false
@@ -102,24 +102,39 @@ var Weekday = map[string]time.Weekday{
 	"Sunday":    time.Sunday,
 }
 
-func turnOff(device Device) error {
-	return errors.Join(errors.New("Device turn off"), deviceAction(device, device.TurnOff))
+func turnOff(settings Settings) error {
+	err := deviceAction(settings, settings.Device.TurnOff)
+
+	if err == nil {
+		return nil
+	} else {
+		return errors.Join(errors.New("Device turn off"), err)
+	}
 }
 
-func turnOn(device Device) error {
-	return errors.Join(errors.New("Device turn on"), deviceAction(device, device.TurnOn))
+func turnOn(settings Settings) error {
+
+	err := deviceAction(settings, settings.Device.TurnOn)
+
+	if err == nil {
+		return nil
+	} else {
+		return errors.Join(errors.New("Device turn on"), err)
+	}
 }
 
-func deviceAction(device Device, action string) error {
+func deviceAction(settings Settings, action string) error {
 	payload := strings.NewReader(`{"args":[]}`)
 
-	deviceId := strconv.Itoa(device.Id)
+	deviceId := strconv.Itoa(settings.Device.Id)
 
 	req, err := http.NewRequest("POST", "http://192.168.1.37/api/devices/"+deviceId+"/action/"+action, payload)
 
 	if err != nil {
 		return err
 	}
+
+	auth := "Basic " + base64.StdEncoding.EncodeToString([]byte(settings.User.Email+":"+settings.User.Password))
 
 	req.Header.Add("accept", "*/*")
 	req.Header.Add("Content-Type", "application/json")
