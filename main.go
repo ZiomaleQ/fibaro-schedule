@@ -47,6 +47,8 @@ func main() {
 							if err != nil {
 								panic(err)
 							}
+
+							fmt.Println("Turned on")
 						}
 						lastKnownValue = true
 						inSchedule = true
@@ -61,6 +63,8 @@ func main() {
 			if err != nil {
 				panic(err)
 			}
+
+			fmt.Println("Turned off")
 
 			lastKnownValue = false
 		}
@@ -149,16 +153,4 @@ func deviceAction(settings Settings, action string) error {
 	}
 
 	return nil
-}
-
-type DeviceState struct {
-	Properties struct {
-		Parameters []struct {
-			ID                int     `json:"id"`
-			LastReportedValue float64 `json:"lastReportedValue"`
-			LastSetValue      float64 `json:"lastSetValue"`
-			Size              int     `json:"size"`
-			Value             float64 `json:"value"`
-		} `json:"parameters"`
-	} `json:"properties"`
 }
